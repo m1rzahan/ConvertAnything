@@ -145,6 +145,6 @@ pdfImage.place(x=120, y=520)
 pdfWord = Button(root, text="PDF to WORD", width=20, height=2, bg="green",
                  fg="white", font=("helvetica", 12, "bold"), command=pdfToWord)
 pdfWord.place(x=120, y=620)
-root.geometry("600x600+400+200")
+root.geometry("800x800+400+200")
 
 root.mainloop()
