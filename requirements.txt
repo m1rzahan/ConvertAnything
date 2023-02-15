@@ -1,0 +1,5 @@
+pdf2image:1.16.2
+docx2pdf:0.1.8
+Pillow:9.0.1
+moviepy:1.0.3
+pdf2docx:0.5.6
