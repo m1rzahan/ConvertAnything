@@ -1,6 +1,9 @@
 
 from tkinter import *
 from tkinter import filedialog as fd
+from docx import Document
+import cv2
+import pytesseract as pytesseract
 from pdf2image import convert_from_path
 from docx2pdf import convert
 from PIL import Image
@@ -8,9 +11,19 @@ from tkinter import messagebox
 from moviepy.editor import *
 # import PyPDF2
 from pdf2docx import Converter
-
+import webbrowser
 root = Tk()
 
+def aboutLabel():
+   webbrowser.open_new(r"https://www.mirzahan.dev")
+
+menubar = Menu(root)
+filemenu = Menu(menubar, tearoff=0)
+
+helpmenu = Menu(menubar, tearoff=0)
+
+#helpmenu.add_command(label="About...", command=aboutLabel)
+menubar.add_command(label="About", command=aboutLabel)
 root.title("Convert Anything")
 def jpgToPng():
     global im1
@@ -121,30 +134,66 @@ def pdfToJpg():
 
         messagebox.showerror("Fail!!", "Something Went Wrong...")
 
+def ocrCore(img):
+    text= pytesseract.image_to_string(img)
+    return text
+def getGrayscale(image):
+    return cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+def removeNoise(image):
+    return cv2.medianBlur(image,5)
+def thresholding(image):
+    return cv2.threshold(image,0,255,cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+def imageToText():
+    import_filename = fd.askopenfilename()
+    if import_filename.endswith(".png"):
+        img = cv2.imread(import_filename)
+        img = getGrayscale(img)
+        img = thresholding(img)
+        img = removeNoise(img)
+        text = ocrCore(img)
+        print(text)
+        newText = text.replace("\x0c","")
+        document = Document()
+        document.add_paragraph(newText)
+        export_filename = fd.asksaveasfilename(defaultextension=".docx")
+        document.save(export_filename)
+        messagebox.showinfo("success ", "your  pdf file converted to jpg ")
+    else:
+        Label_2 = Label(root, text="Error!", width=20,
+                        fg="red", font=("bold", 15))
+        Label_2.place(x=80, y=280)
 
-button1 = Button(root, text="JPG & JPEG to PNG", width=20, height=2, bg="green",
-                 fg="white", font=("helvetica", 12, "bold"), command=jpgToPng)
+        messagebox.showerror("Fail!!", "Something Went Wrong...")
+jpgToPngButton = Button(root, text="JPG & JPEG to PNG", width=20, height=2, bg="blue",
+                        fg="white", font=("helvetica", 12, "bold"), command=jpgToPng)
 
-button1.place(x=120, y=120)
+jpgToPngButton.place(x=120, y=120)
 
-button2 = Button(root, text="PNG to JPG", width=20, height=2, bg="green",
-                 fg="white", font=("helvetica", 12, "bold"), command=pngToJpg)
+pngToJpgButton = Button(root, text="PNG to JPG", width=20, height=2, bg="blue",
+                        fg="white", font=("helvetica", 12, "bold"), command=pngToJpg)
 
-button2.place(x=120, y=220)
-mp4Button = Button(root, text="MP4 to MP3", width=20, height=2, bg="green",
+pngToJpgButton.place(x=420, y=120)
+
+mp4Button = Button(root, text="MP4 to MP3", width=20, height=2, bg="blue",
                    fg="white", font=("helvetica", 12, "bold"), command=mp4ToMp3)
 mp4Button.place(x=120, y=320)
 
-wordPdf = Button(root, text="Word to PDF", width=20, height=2, bg="green",
+wordPdf = Button(root, text="Word to PDF", width=20, height=2, bg="blue",
                  fg="white", font=("helvetica", 12, "bold"), command=wordToPdf)
-wordPdf.place(x=120, y=420)
+wordPdf.place(x=420, y=320)
 
-pdfImage = Button(root, text="PDF to JPG", width=20, height=2, bg="green",
+pdfImage = Button(root, text="PDF to JPG", width=20, height=2, bg="blue",
                   fg="white", font=("helvetica", 12, "bold"), command=pdfToJpg)
 pdfImage.place(x=120, y=520)
-pdfWord = Button(root, text="PDF to WORD", width=20, height=2, bg="green",
+pdfWord = Button(root, text="PDF to WORD", width=20, height=2, bg="blue",
                  fg="white", font=("helvetica", 12, "bold"), command=pdfToWord)
-pdfWord.place(x=120, y=620)
+pdfWord.place(x=420, y=520)
+
+imgToText = Button(root, text="Image to Text", width=20, height=2, bg="blue",
+                 fg="white", font=("helvetica", 12, "bold"), command=imageToText)
+imgToText.place(x=120, y=720)
 root.geometry("800x800+400+200")
+root.config(menu=menubar)
+root.resizable(False, False)
 
 root.mainloop()
