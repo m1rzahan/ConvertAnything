@@ -1,4 +1,5 @@
-
+import tkinter
+from enum import Enum
 from tkinter import *
 from tkinter import filedialog as fd
 from docx import Document
@@ -12,6 +13,7 @@ from moviepy.editor import *
 # import PyPDF2
 from pdf2docx import Converter
 import webbrowser
+from pytube import YouTube
 root = Tk()
 
 def aboutLabel():
@@ -157,6 +159,28 @@ def imageToText():
         document.add_paragraph(newText)
         export_filename = fd.asksaveasfilename(defaultextension=".docx")
         document.save(export_filename)
+
+def downloadYoutubeVideo():
+
+        url = YouTube(str(link.get()))
+        video = url.streams.first()
+        export_filename = fd.asksaveasfilename()
+        video.download(export_filename)
+        tkinter.Label(second_page, text='Your Video is downloaded!', font='arial 15', fg="White", bg="#EC7063").place(x=10, y=140)
+def downloadYoutubePage():
+    global link
+    global second_page
+    second_page = tkinter.Toplevel(root)
+    second_page.geometry("700x700")
+    # create a label widget in the new window
+    label = tkinter.Label(second_page, text="Youtube Video Downloader")
+    link = tkinter.StringVar()
+    tkinter.Label(second_page, text = 'Paste Your YouTube Link Here:', font = 'arial 20 bold',fg="Black",bg="#EC7063").place(x= 5 , y = 60)
+    label.pack()
+    link_enter = tkinter.Entry(second_page, width=53, textvariable=link, font='arial 15 bold', bg="lightgreen").place(x=5, y=100)
+    tkinter.Button(second_page, text='DOWNLOAD VIDEO', font='arial 15 bold', fg="white", bg='black', padx=2,
+                   command=downloadYoutubeVideo).place(x=385, y=140)
+
 jpgToPngButton = Button(root, text="JPG & JPEG to PNG", width=20, height=2, bg="blue",
                         fg="white", font=("helvetica", 12, "bold"), command=jpgToPng)
 
@@ -185,6 +209,9 @@ pdfWord.place(x=420, y=520)
 imgToText = Button(root, text="Image to Text", width=20, height=2, bg="blue",
                  fg="white", font=("helvetica", 12, "bold"), command=imageToText)
 imgToText.place(x=120, y=720)
+youtubeButton = Button(root, text="Youtube to MP4", width=20, height=2, bg="blue",
+                       fg="white", font=("helvetica", 12, "bold"), command=downloadYoutubePage)
+youtubeButton.place(x=420, y=720)
 root.geometry("800x800+400+200")
 root.config(menu=menubar)
 root.resizable(False, False)
